@@ -1,13 +1,11 @@
-build-docker-image:
-    name: Publish to Docker Hub
-    runs-on: ubuntu-latest
-    needs: [build_and_test]
+# Usa una imagen base (por ejemplo, OpenJDK para una aplicación Java)
+FROM openjdk:17-jdk-slim
 
-    steps:
-      - uses: actions/checkout@v2
-      - name: Login to Docker Hub
-        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build Container image
-        run: docker build -t ${{ secrets.DOCKER_REPO }}:latest .
-      - name: Publish Docker image
-        run: docker push ${{ secrets.DOCKER_REPO }}
+# Establece el directorio de trabajo dentro del contenedor
+WORKDIR /app
+
+# Copia los archivos de tu proyecto al contenedor
+COPY target/*.jar app.jar
+
+# Ejecuta la aplicación cuando el contenedor se inicia
+ENTRYPOINT ["java", "-jar", "app.jar"]
